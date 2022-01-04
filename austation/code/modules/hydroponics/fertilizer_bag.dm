@@ -20,7 +20,6 @@
 	var/mutate_mat_spd = 0//maturation_speed -
 	var/mutate_lif = 0//lifespan -
 	var/mutate_end = 0//endurance -
-	var/mutate_prd = 0//production
 
 /obj/item/reagent_containers/fertilizer_bag/Initialize()
 	. = ..()
@@ -42,7 +41,6 @@
 			mix += list(/datum/reagent/uranium)
 		mutate_yld = TRUE
 		mutate_pot = TRUE
-		mutate_prd = TRUE
 
 	else if(reagents.has_reagent(/datum/reagent/toxin/mutagen, 1))
 		if(!check_contents(/datum/reagent/toxin/mutagen))
@@ -78,7 +76,6 @@
 						mutate_prd_spd,
 						mutate_mat_spd,
 						mutate_lif,
-						mutate_end,
-						mutate_prd)
+						mutate_end)
 	var/A = rand(0, 6)
 	rem_list[A] = FALSE

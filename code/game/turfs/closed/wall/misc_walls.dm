@@ -108,3 +108,11 @@
 		qdel(interloper)
 
 	qdel(AM)
+
+/turf/closed/wall/fiberous_plant_enzyme
+	name = "Plant wall"
+	desc = "A section of knotted vine."
+	icon = 'icons/turf/walls/rusty_wall.dmi'
+	hardness = 50
+	slicing_duration = 5
+	canSmoothWith = null

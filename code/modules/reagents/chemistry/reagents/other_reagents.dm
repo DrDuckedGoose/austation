@@ -46,7 +46,26 @@
 /datum/reagent/plantnutriment/generic_fertilizer // Tis' fertilizer
 	name = "Generic Fertilizer"
 	color = "#3015097c"
-	taste_description = "Earthworm Jim"
+	taste_description = "Earthworm Jim..."
+
+/datum/reagent/plantnutriment/fiberous_plant_enzyme //This will get removed or nerfed within a month, $5
+	name = "Fiberous plant enzyme"
+	color = "#299e067c"
+	taste_description = "Tree bark"
+
+/datum/reagent/fiberous_plant_enzyme/reaction_turf(turf/T, reac_volume)
+	if(isfloorturf(T))
+		var/turf/open/floor/F = T
+		if(isfloorturf(F))
+			for(var/turf/open/turf in RANGE_TURFS(1,F))
+				if(!locate(/turf/closed/wall) in turf)
+					new /turf/closed/wall/fiberous_plant_enzyme
+				else	
+					var/turf/closed/wall/fiberous_plant_enzyme/L = locate(/turf/closed/wall)
+					if(L.hardness > 30)
+						L.hardness -= 2.5 
+
+
 
 /datum/reagent/blood
 	data = list("viruses"=null,"blood_DNA"=null,"blood_type"=null,"resistances"=null,"trace_chem"=null,"mind"=null,"ckey"=null,"gender"=null,"real_name"=null,"cloneable"=null,"factions"=null,"quirks"=null)

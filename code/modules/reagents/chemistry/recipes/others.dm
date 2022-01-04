@@ -815,3 +815,9 @@
 	id = "decaying plant enzyme"
 	results = list(/datum/reagent/decaying_plant_enzyme = 2)
 	required_reagents  = list(/datum/reagent/unstable_plant_enzyme = 1, /datum/reagent/uranium/radium = 1)
+
+/datum/chemical_reaction/fiberous_plant_enzyme
+	name = "Fiberous plant enzyme"
+	id = "fiberous plant enzyme"
+	results = list(/datum/reagent/fiberous_plant_enzyme = 2)
+	required_reagents  = list(/datum/reagent/unstable_plant_enzyme = 1, /datum/reagent/growthserum = 1)
