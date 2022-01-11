@@ -73,10 +73,9 @@
 	update_effects()
 
 	if(istype(I, /obj/item/plant_analyzer))
-		to_chat(user, "Fertilizer traits:\n")
-		if(effects)
-			for(var/A in effects)
-				to_chat(user, effects[A])
+		to_chat(user, "Fertilizer traits:")
+		for(var/A in effects)
+			to_chat(user, effects[A]+"\n")
 
 /obj/item/reagent_containers/fertilizer_bag/proc/check_contents(var/C)
 	if(C in mix)
