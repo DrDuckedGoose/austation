@@ -178,6 +178,10 @@
 	desc = "Diabeetus"
 	list_reagents = list(/datum/reagent/bonding_plant_enzyme = 50)
 
+/obj/item/reagent_containers/glass/bottle/nutrient/generic_fertilizer
+	name = "bottle of Generic fertilizer"
+	desc = "Diabeetus"
+	list_reagents = list(/datum/reagent/bonding_plant_enzyme = 50)
 
 /obj/item/reagent_containers/glass/bottle/nutrient/ez
 	name = "bottle of E-Z-Nutrient"

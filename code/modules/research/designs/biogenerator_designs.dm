@@ -244,3 +244,12 @@
 	build_path = /obj/item/reagent_containers/glass/bottle/nutrient/bonding_plant_enzyme
 	category = list("initial","Plant Enzymes")
 
+/datum/design/generic_fertilizer
+	name = "Generic Fertilizer"
+	id = "generic_fertilizer"
+	build_type = BIOGENERATOR
+	materials = list(/datum/material/biomass = 0)
+	build_path = /obj/item/reagent_containers/glass/bottle/nutrient/generic_fertilizer
+	category = list("initial","Plant Enzymes")
+
+///datum/reagent/plantnutriment/generic_fertilizer

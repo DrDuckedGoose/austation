@@ -56,15 +56,19 @@
 			apply_strength -= 0.10
 			mix += list(/datum/reagent/water)
 		remove_random_trait()
+		
 	else if(reagents.has_reagent(/datum/reagent/medicine/earthsblood, 1))
 		if(!check_contents(/datum/reagent/medicine/earthsblood))
 			apply_chance += apply_chance*0.3
 			apply_strength += 0.15
 			mix += list(/datum/reagent/medicine/earthsblood)
 
+	reagents.isolate_reagent(/datum/reagent/plantnutriment/generic_fertilizer)
+
+
 /obj/item/reagent_containers/fertilizer_bag/attackby(obj/item/I, mob/living/user, params)
 	update_effects()
-	if(!I == /obj/item/plant_analyzer)
+	if(I != /obj/item/plant_analyzer)
 		playsound(src, 'sound/effects/bubbles2.ogg', 80, 1, -3)
 	else	
 		to_chat(user, "Fertilizer traits:\n")
