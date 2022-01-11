@@ -526,10 +526,10 @@
 		mutmod = 0
 		adjustNutri(round(S.get_reagent_amount(/datum/reagent/plantnutriment/robustharvestnutriment) *1 ))
 
-	if(S.has_reagent(/datum/reagent/plantnutriment/generic_fertilizer, 1))//Look here dummy
+	if(S.has_reagent(/datum/reagent/generic_fertilizer, 1))//Look here dummy
 		yieldmod = 1 //I suppose it should be worse
 		mutmod = 0
-		adjustNutri(round(S.get_reagent_amount(/datum/reagent/plantnutriment/generic_fertilizer) *1 ))
+		adjustNutri(round(S.get_reagent_amount(/datum/reagent/generic_fertilizer) *1 ))
 
 	// Ambrosia Gaia produces earthsblood.
 	if(S.has_reagent(/datum/reagent/medicine/earthsblood))
@@ -805,7 +805,7 @@
 		var/chancey = P.apply_chance*100
 		var/strength = P.apply_strength*100
 
-		if(!P.reagents.total_volume||!P.reagents.has_reagent(/datum/reagent/plantnutriment/generic_fertilizer, 1))
+		if(!P.reagents.total_volume||!P.reagents.has_reagent(/datum/reagent/generic_fertilizer, 1))
 			to_chat(user, "<span class='notice'>[P] is empty.</span>")
 		else
 			if(myseed)

@@ -10,6 +10,7 @@
 	var/bag_capacity = 300
 	var/mix = list()
 	var/mix_size = 0
+	var/effects = list()
 	var/apply_chance = 0
 	var/apply_strength = 0
 
@@ -31,6 +32,7 @@
 			apply_chance += 0.20
 			apply_strength += 0.10
 			mix += list(/datum/reagent/uranium/radium)
+			effects += list("Can mutate endurance","Can mutate lifespan")
 		mutate_end = TRUE
 		mutate_lif = TRUE
 
@@ -39,6 +41,7 @@
 			apply_chance += 0.25
 			apply_strength += 0.25
 			mix += list(/datum/reagent/uranium)
+			effects += list("Can mutate yield","Can mutate potency")
 		mutate_yld = TRUE
 		mutate_pot = TRUE
 
@@ -47,6 +50,7 @@
 			apply_chance += 0.20
 			apply_strength += 0.15
 			mix += list(/datum/reagent/toxin/mutagen)
+			effects += list("Can mutate maturation speed","Can mutate production speed")
 		mutate_mat_spd = TRUE
 		mutate_prd_spd = TRUE
 
@@ -56,24 +60,23 @@
 			apply_strength -= 0.10
 			mix += list(/datum/reagent/water)
 		remove_random_trait()
-		
+
 	else if(reagents.has_reagent(/datum/reagent/medicine/earthsblood, 1))
 		if(!check_contents(/datum/reagent/medicine/earthsblood))
 			apply_chance += apply_chance*0.3
 			apply_strength += 0.15
 			mix += list(/datum/reagent/medicine/earthsblood)
 
-	reagents.isolate_reagent(/datum/reagent/plantnutriment/generic_fertilizer)
-
+	reagents.isolate_reagent(/datum/reagent/generic_fertilizer)
 
 /obj/item/reagent_containers/fertilizer_bag/attackby(obj/item/I, mob/living/user, params)
 	update_effects()
-	if(I != /obj/item/plant_analyzer)
-		playsound(src, 'sound/effects/bubbles2.ogg', 80, 1, -3)
-	else	
+
+	if(istype(I, /obj/item/plant_analyzer))
 		to_chat(user, "Fertilizer traits:\n")
-		for(var/A in mix_size)
-			to_chat(user, "<span class='notice'>[mix[A]]</span>)")
+		if(effects)
+			for(var/A in effects)
+				to_chat(user, effects[A])
 
 /obj/item/reagent_containers/fertilizer_bag/proc/check_contents(var/C)
 	if(C in mix)

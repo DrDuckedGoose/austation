@@ -43,12 +43,12 @@
 	color = "#7dc025"
 	taste_description = "flowers & warp"
 
-/datum/reagent/plantnutriment/generic_fertilizer // Tis' fertilizer
+/datum/reagent/generic_fertilizer // Tis' fertilizer
 	name = "Generic Fertilizer"
 	color = "#3015097c"
 	taste_description = "Earthworm Jim..."
 
-/datum/reagent/plantnutriment/fiberous_plant_enzyme //This will get removed or nerfed within a month, $5
+/datum/reagent/fiberous_plant_enzyme //This will get removed or nerfed within a month, $5
 	name = "Fiberous plant enzyme"
 	color = "#299e067c"
 	taste_description = "Tree bark"
