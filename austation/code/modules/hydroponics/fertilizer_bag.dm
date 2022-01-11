@@ -1,6 +1,6 @@
 /obj/item/reagent_containers/fertilizer_bag
 	name = "Fertilizer Bag"
-	desc = "A plant's meal sack."
+	desc = "A bag for fertilizer."
 	icon = 'icons/obj/device.dmi'
 	icon_state = "hydro"
 	lefthand_file = 'icons/mob/inhands/equipment/tools_lefthand.dmi'
@@ -64,7 +64,12 @@
 
 /obj/item/reagent_containers/fertilizer_bag/attackby(obj/item/I, mob/living/user, params)
 	update_effects()
-	to_chat(user, "check mixed by")
+	if(!I == /obj/item/plant_analyzer)
+		playsound(src, 'sound/effects/bubbles2.ogg', 80, 1, -3)
+	else	
+		to_chat(user, "Fertilizer traits:\n")
+		for(var/A in mix_size)
+			to_chat(user, "<span class='notice'>[mix[A]]</span>)")
 
 /obj/item/reagent_containers/fertilizer_bag/proc/check_contents(var/C)
 	if(C in mix)
