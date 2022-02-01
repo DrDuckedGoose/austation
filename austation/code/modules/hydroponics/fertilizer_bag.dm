@@ -7,6 +7,7 @@
 	righthand_file = 'icons/mob/inhands/equipment/tools_righthand.dmi'
 	w_class = WEIGHT_CLASS_TINY
 	resistance_flags = FLAMMABLE
+	volume = 300
 	var/bag_capacity = 300
 	var/mix = list()
 	var/mix_size = 0
@@ -70,12 +71,16 @@
 	reagents.isolate_reagent(/datum/reagent/generic_fertilizer)
 
 /obj/item/reagent_containers/fertilizer_bag/attackby(obj/item/I, mob/living/user, params)
+	. = ..()
 	update_effects()
 
 	if(istype(I, /obj/item/plant_analyzer))
 		to_chat(user, "Fertilizer traits:")
-		for(var/A in effects)
-			to_chat(user, effects[A]+"\n")
+		for(var/A in 1 to 7)
+			to_chat(user, "-"+effects[A]+"-\n")
+/obj/item/reagent_containers/fertilizer_bag/on_reagent_change(changetype)
+	. = ..()
+	update_effects()
 
 /obj/item/reagent_containers/fertilizer_bag/proc/check_contents(var/C)
 	if(C in mix)
