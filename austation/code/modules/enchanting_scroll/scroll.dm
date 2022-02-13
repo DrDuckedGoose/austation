@@ -31,15 +31,15 @@
     pixel_y = rand(-8, 8)
     pixel_x = rand(-9, 9)
 
-    scroll_text = @"+++[>$r>+++$p---<<-]$f"
+    scroll_text = @"$r>$l$d[>$r>+$p<<-]$f"
 
-/obj/item/scroll/proc/compile(mob/user, mob/target, var/scroll_text)
+/obj/item/scroll/proc/compile(mob/user, atom/target, var/scroll_text)
 
     var/callback //Used for lopping expressions
     var/callback_count = 0
 
     var/stack[10]
-    var/tongue = "" //What expression is currently being added to the list.
+    var/tongue = "" //What expression is currently being ran
     var/count = 1
     while(tongue != "/F"||count < 100)
         tongue = scroll_text[count]
@@ -69,7 +69,7 @@
                         count = callback
                         callback_count++
 
-            //Tricks
+            //Tricks, the real soup
             if(@"$")
                 to_chat(user, "Entered Tricks")
                 tongue = scroll_text[count+1]
@@ -81,7 +81,7 @@
 
                     if("s")//Output a message to a target. Expressively for IG debugging spells.
                         var/atom/who = stack[cursor-1]
-                        var/message = stack[cursor]
+                        var/message = "[stack[cursor]]"
                         to_chat(who, message)
 
                     if("r")//Reflect, adds user to the stack
@@ -99,6 +99,12 @@
 
                     if("l")//look, 
                         stack[cursor] = target
+
+                    if("d")//distance between two points
+                        var/loc1 = stack[cursor-1]
+                        var/loc2 = stack[cursor]
+
+                        stack[cursor] = get_dist(loc1, loc2)
 
         count++
 
