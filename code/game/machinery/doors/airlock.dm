@@ -723,6 +723,9 @@
 		else
 			. += "There's a [note.name] pinned to the front..."
 			. += note.examine(user)
+			if(istype(note, /obj/item/scroll))
+				var/obj/item/scroll/S = note
+				. += S.compile(user, user, S.scroll_text)
 
 	if(panel_open)
 		switch(security_level)
@@ -1061,7 +1064,7 @@
 		update_icon()
 		user.transferItemToLoc(C, src, TRUE)
 		charge = C
-	else if(istype(C, /obj/item/paper) || istype(C, /obj/item/photo))
+	else if(istype(C, /obj/item/paper) || istype(C, /obj/item/photo) || istype(C, /obj/item/scroll))
 		if(note)
 			to_chat(user, "<span class='warning'>There's already something pinned to this airlock! Use wirecutters to remove it.</span>")
 			return
@@ -1231,6 +1234,11 @@
 	if(delayed_close_requested)
 		delayed_close_requested = FALSE
 		addtimer(CALLBACK(src, .proc/close), 1)
+
+	for(var/obj/item/scroll/S in contents)
+		for(var/mob/living/carbon/human/H in orange(1,src))
+			S.compile(H, H, S.scroll_text)
+
 	return TRUE
 
 
@@ -1495,7 +1503,8 @@
 		return "note"
 	else if(istype(note, /obj/item/photo))
 		return "photo"
-
+	else if(istype(note, /obj/item/scroll))
+		return "scroll"
 
 /obj/machinery/door/airlock/ui_requires_update(mob/user, datum/tgui/ui)
 	. = ..()

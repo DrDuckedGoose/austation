@@ -153,6 +153,7 @@
 			open()
 		else
 			do_animate("deny")
+
 	return
 
 /obj/machinery/door/attack_hand(mob/user)
@@ -180,7 +181,7 @@
 		return TRUE
 	if(density)
 		do_animate("deny")
-
+		
 /obj/machinery/door/allowed(mob/M)
 	if(emergency)
 		return TRUE

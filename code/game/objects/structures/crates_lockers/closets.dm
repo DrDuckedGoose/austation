@@ -191,6 +191,10 @@
 	dump_contents()
 	animate_door(FALSE)
 	update_icon()
+
+	for(var/obj/item/scroll/S in contents)
+		S.compile(user, user, S.scroll_text)
+
 	return 1
 
 /obj/structure/closet/proc/insert(atom/movable/AM)

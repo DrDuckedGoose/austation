@@ -73,7 +73,7 @@
 
             if(@"]")
                 if(callback)
-                    //wait call here
+                    sleep(1)
                     if(stack[cursor] && callback_count < MAX_CALLBACK) 
                         count = callback
                         callback_count++
@@ -145,17 +145,14 @@
                         var/atom/movable/AM = who
                         do_teleport(AM, destination)
 
-                    if("h")//zap - harmless stun
+                    if("z")//zap - harmless stun
                         var/mob/living/carbon/who = stack[cursor]
                         who.electrocute_act(1, user, 1, 1)
 
                     if("i")//interact
-                        var/atom/what = stack[cursor]
-                        switch(what)
-                            if(istype(what, /obj/structure/closet))
-                                what.toggle(user)
-                            else
-                                what.ui_interact(user)
+                        var/obj/what = stack[cursor]
+                        what.attack_self_tk(user)
+                    
 
         count++
 
@@ -171,4 +168,18 @@
 
     cursor = 1
     compile(user, target, scroll_text)
-        
+
+/obj/item/scroll/examine(mob/user)
+	. = ..()
+	if(!in_range(user, src) && !isobserver(user))
+		. += "<span class='warning'>You're too far away to read it!</span>"
+		return
+	if(user.can_read(src))
+		compile(user, user, scroll_text)
+		return
+	. += "<span class='warning'>You cannot read it!</span>"
+
+/obj/item/scroll/can_interact(mob/user)
+	if(in_contents_of(/obj/machinery/door/airlock))
+		return TRUE
+	return ..()
