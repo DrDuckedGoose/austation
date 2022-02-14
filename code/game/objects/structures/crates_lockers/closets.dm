@@ -181,19 +181,21 @@
 			break
 
 /obj/structure/closet/proc/open(mob/living/user)
+
 	if(opened || !can_open(user))
 		return
 	playsound(loc, open_sound, open_sound_volume, 1, -3)
 	opened = TRUE
+
+	for(var/obj/item/scroll/S in contents)
+		S.compile(src, user, S.scroll_text)
+
 	if(!dense_when_open)
 		density = FALSE
 	climb_time *= 0.5 //it's faster to climb onto an open thing
 	dump_contents()
 	animate_door(FALSE)
 	update_icon()
-
-	for(var/obj/item/scroll/S in contents)
-		S.compile(src, user, S.scroll_text)
 
 	return TRUE
 

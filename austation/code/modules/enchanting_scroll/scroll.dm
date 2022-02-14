@@ -43,6 +43,8 @@
     var/tongue = "" //What expression is currently being ran
     var/count = 1
 
+    cursor = 1
+
     if(in_memory[2])stack[in_memory[1]] = in_memory[2]
 
     while(tongue != "/F"||count < 100)
@@ -160,13 +162,11 @@
     return 1
 
 /obj/item/scroll/attack_self(mob/user)
-    cursor = 1
     compile(user, user, scroll_text)
 
 /obj/item/scroll/afterattack(atom/target, mob/user, proximity)
     ..()
 
-    cursor = 1
     compile(user, target, scroll_text)
 
 /obj/item/scroll/examine(mob/user)
