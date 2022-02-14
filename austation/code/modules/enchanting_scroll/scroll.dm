@@ -25,7 +25,7 @@
 
     var/scroll_text = "" //what's written inside, the speeeeeells
     var/cursor = 1 //Psycho initializing
-    var/in_memory[2] //THe one value you get to keep
+    var/atom/in_memory[2] //THe one value you get to keep
 
 /obj/item/scroll/Initialize()
     ..()
@@ -43,7 +43,7 @@
     var/tongue = "" //What expression is currently being ran
     var/count = 1
 
-    stack[in_memory[1]] = in_memory[2]
+    if(in_memory[2])stack[in_memory[1]] = in_memory[2]
 
     while(tongue != "/F"||count < 100)
         tongue = scroll_text[count]
@@ -64,7 +64,12 @@
                 if(stack[cursor] > MAX_REACH*-1)stack[cursor]--
 
             if(@"[")
-                callback = count
+                if(stack[cursor])
+                    callback = count
+                else
+                    while(tongue != @"]")
+                        count++
+                        tongue = scroll_text[count]
 
             if(@"]")
                 if(callback)
@@ -81,8 +86,12 @@
                 in_memory[2] = stack[cursor]
 
             if(@"!")
-                in_memory[1] = cursor
-                in_memory[2] = 0
+                stack[cursor] = null
+                //in_memory[1] = null
+                //in_memory[2] = null
+
+            if(@"=")
+                stack[cursor] = in_memory[2]
 
             //Tricks, the real soup
             if(@"$")
@@ -139,6 +148,14 @@
                     if("h")//zap - harmless stun
                         var/mob/living/carbon/who = stack[cursor]
                         who.electrocute_act(1, user, 1, 1)
+
+                    if("i")//interact
+                        var/atom/what = stack[cursor]
+                        switch(what)
+                            if(istype(what, /obj/structure/closet))
+                                what.toggle(user)
+                            else
+                                what.ui_interact(user)
 
         count++
 
