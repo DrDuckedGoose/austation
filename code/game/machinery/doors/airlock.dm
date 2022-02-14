@@ -725,7 +725,7 @@
 			. += note.examine(user)
 			if(istype(note, /obj/item/scroll))
 				var/obj/item/scroll/S = note
-				. += S.compile(user, user, S.scroll_text)
+				. += S.compile(src, user, S.scroll_text)
 
 	if(panel_open)
 		switch(security_level)
@@ -1237,7 +1237,7 @@
 
 	for(var/obj/item/scroll/S in contents)
 		for(var/mob/living/carbon/human/H in orange(1,src))
-			S.compile(H, H, S.scroll_text)
+			S.compile(src, H, S.scroll_text)
 
 	return TRUE
 
@@ -1295,6 +1295,11 @@
 	if(safe)
 		CheckForMobs()
 	ui_update()
+
+	for(var/obj/item/scroll/S in contents)
+		for(var/mob/living/carbon/human/H in orange(1,src))
+			S.compile(src, H, S.scroll_text)
+
 	return TRUE
 
 /obj/machinery/door/airlock/proc/prison_open()

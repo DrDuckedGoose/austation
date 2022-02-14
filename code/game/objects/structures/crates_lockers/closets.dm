@@ -193,9 +193,9 @@
 	update_icon()
 
 	for(var/obj/item/scroll/S in contents)
-		S.compile(user, user, S.scroll_text)
+		S.compile(src, user, S.scroll_text)
 
-	return 1
+	return TRUE
 
 /obj/structure/closet/proc/insert(atom/movable/AM)
 	if(contents.len >= storage_capacity)
@@ -248,6 +248,7 @@
 	density = TRUE
 	animate_door(TRUE)
 	update_icon()
+
 	return TRUE
 
 /obj/structure/closet/proc/toggle(mob/living/user)
