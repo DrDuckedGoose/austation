@@ -2,9 +2,11 @@
     Copying some of obj/item/paper code
 
 */
-#define MAX_EXPRESSION_LENGTH 30
-#define MAX_REACH 50
-#define MAX_CALLBACK 10
+#define MAX_EXPRESSION_LENGTH 100 //Max symbols a spell can have, this includes both parts of a trick, $ & A. Generally to stop OP complex spells. 
+#define MAX_REACH 50 //Max distance a spell can reach, mainly stops people teleporting too far
+#define MAX_INTEGER 100 //Max number expression. As of writing, I don;t think big numbers can be exploited but, I'm not taking that risk.
+#define MAX_CALLBACK 9 //Stops loops from being infinite, pretty obvious why that's necesary.
+
 
 /obj/item/scroll
     name = "Enchanting Scroll"
@@ -23,95 +25,107 @@
     max_integrity = 150
     color = "white"
 
-    var/scroll_text = "" //what's written inside, the speeeeeells
-    var/cursor = 1 //Psycho initializing
-    var/atom/in_memory[2] //THe one value you get to keep
+    var/scroll_text = "" //what's written inside, the spell. Expressions & tricks
+    var/atom/in_memory[2] //Which stack to save
+    var/GREATER_SPELLS = FALSE //Grand virgin shit
 
 /obj/item/scroll/Initialize()
     ..()
     pixel_y = rand(-8, 8)
     pixel_x = rand(-9, 9)
 
-    scroll_text = @"+<<[>>-]>>[>$l<-]$r>$t$f"
-
 /obj/item/scroll/proc/compile(mob/user, atom/target, var/scroll_text)
+    //Variables set here are done so that they can be reset every call
 
-    var/callback //Used for lopping expressions
-    var/callback_count = 0
+    var/callback[MAX_CALLBACK] //Which loop/bracket is being discussed
+    var/callback_cursor = 1 //Used for navigating callbacks ^
+    var/callback_count[MAX_CALLBACK] //Keep track of how many times a loop has recalled, should never exceed MAX_CALLBACK
 
-    var/stack[10]
-    var/tongue = "" //What expression is currently being ran
-    var/count = 1
+    var/stack[10]//Temporary memory stack
+    var/cursor = 1//used for navigating stack ^
 
-    cursor = 1
+    var/tongue = "" //What part of the spell is being read
+    var/count = 1 //Essentially acts as a cursor
 
-    if(in_memory[2])stack[in_memory[1]] = in_memory[2]
+    var/list_cursor = 1 //Cursor for navigating lists, rarely used
 
-    while(tongue != "/F"||count < 100)
+    if(in_memory[2])stack[in_memory[1]] = in_memory[2] //Load memory into saved stack
+
+    while(tongue||count < 100)
         tongue = scroll_text[count]
-        //to_chat(user, tongue)
 
         switch(tongue)
             //Regular expressions
-            if(@">")
+            if(@">")//Move to right stack
                 if(cursor < 30)cursor++
 
-            if(@"<")
+            if(@"<")//Move to left stack
                 if(cursor > 1)cursor--
 
-            if(@"+")
-                if(stack[cursor] < MAX_REACH)stack[cursor]++
+            if(@"+")//Iterate stack foward
+                if(stack[cursor] < MAX_INTEGER)stack[cursor]++
 
-            if(@"-")
-                if(stack[cursor] > MAX_REACH*-1)stack[cursor]--
+            if(@"-")//Iterate stack backwards
+                if(stack[cursor] > MAX_INTEGER*-1)stack[cursor]--
 
-            if(@"[")
+            if(@"[")//Jump to next apppropriate "]" if current stack is null
                 if(stack[cursor])
-                    callback = count
-                else
+                    if(!callback[callback_cursor])
+                        callback[callback_cursor] = count
+                    else if(count != callback[callback_cursor])   
+                        callback_cursor++
+                        callback[callback_cursor] = count
+
+                else    
                     while(tongue != @"]")
                         count++
                         tongue = scroll_text[count]
 
-            if(@"]")
-                if(callback)
-                    sleep(1)
-                    if(stack[cursor] && callback_count < MAX_CALLBACK) 
-                        count = callback
-                        callback_count++
-            if(@"^")
-                if(istype(stack[cursor], /mob/living/carbon/))
-                    stack[cursor] = get_turf(stack[cursor])
+            if(@"]")//Jump BACK to next appropriate "[" if stack isn't null
+                if(stack[cursor])
+                    if(callback[callback_cursor] && callback_count[callback_cursor] < MAX_CALLBACK)
+                        count = callback[callback_cursor]
+                        callback_count[callback_cursor]++
+                    else    
+                        callback[callback_cursor] = null
+                        callback_count[callback_cursor] = null
+                        callback_cursor--
 
-            if(@"*")
+                else
+                    callback[callback_cursor] = null
+
+            if(@"*")//Save current stack to memory
                 in_memory[1] = cursor
                 in_memory[2] = stack[cursor]
 
-            if(@"!")
+            if(@"!")//Clear current stack
                 stack[cursor] = null
-                //in_memory[1] = null
-                //in_memory[2] = null
 
-            if(@"=")
+            if(@"=")//Load memory into current stack
                 stack[cursor] = in_memory[2]
 
-            //Tricks, the real soup
+            if(@"^")//Changes where the list_cursor is looking
+                if(list_cursor < 3)
+                    list_cursor++
+                else list_cursor = 1
+
+            //Tricks, exciting!
             if(@"$")
                 tongue = scroll_text[count+1]
                 count++
                 switch(tongue)
-                    if("f")//Finish spell
+                    if("f")//Finish spell, use to save on cooldown
                         tongue = "/F" //Finish command
 
-                    if("s")//Output a message to a target. Expressively for IG debugging spells.
+                    if("s")//Output current stack to previous stack
                         var/atom/who = stack[cursor-1]
                         var/message = stack[cursor]
                         to_chat(who, message)
 
-                    if("r")//Reflect, adds user to the stack
+                    if("r")//Add user to current stack
                         stack[cursor] = user
 
-                    if("p")//Moves a source away from where the player is facing
+                    if("p")//Push previous stack by current stack
                         var/atom/who = stack[cursor-1]
                         var/strength = stack[cursor]
                         var/direction
@@ -121,7 +135,7 @@
                         var/atom/movable/AM = who
                         AM.throw_at(get_edge_target_turf(user, direction), strength, 1)
 
-                    if("q")//Moves a source towards from where the player is facing
+                    if("q")//Pull previous stack by current stack
                         var/atom/who = stack[cursor-1]
                         var/strength = stack[cursor]
                         var/direction
@@ -131,34 +145,38 @@
                         var/atom/movable/AM = who
                         AM.throw_at(get_edge_target_turf(user, direction), strength, 1)
 
-                    if("l")//Where you're looking, aka clicking
+                    if("l")//Set target to current stack, where, who or what you're clicking
                         stack[cursor] = target
 
-                    if("d")//distance between two points
+                    if("d")//Set next stack to the distance between the current and previous stack
                         var/loc1 = stack[cursor-1]
                         var/loc2 = stack[cursor]
 
                         stack[cursor+1] = get_dist(loc1, loc2)
                     
-                    if("t")//teleport
+                    if("t")//Teleport previous stack to current stack
                         var/atom/who = stack[cursor-1]
                         var/destination = stack[cursor]
 
                         var/atom/movable/AM = who
                         do_teleport(AM, destination)
 
-                    if("z")//zap - harmless stun
+                    if("z")//Zap current stack
                         var/mob/living/carbon/who = stack[cursor]
                         who.electrocute_act(1, user, 1, 1)
 
-                    if("i")//interact
+                    if("i")//Interact with current stack
                         var/obj/what = stack[cursor]
                         what.attack_self_tk(user)
+
+                    if("b")//
+                        var/turf/where = get_turf(stack[cursor])
+                        var/loc_list = list(where.x, where.y, where.z)
+                        stack[cursor] = loc_list
+
+                    //if("g")//Takes the current stack, x, and the next stack, y, and adds whatever it finds to the 
                     
-
         count++
-
-    in_memory = stack[-1]
     return 1
 
 /obj/item/scroll/attack_self(mob/user)
@@ -166,18 +184,7 @@
 
 /obj/item/scroll/afterattack(atom/target, mob/user, proximity)
     ..()
-
     compile(user, target, scroll_text)
-
-/obj/item/scroll/examine(mob/user)
-	. = ..()
-	if(!in_range(user, src) && !isobserver(user))
-		. += "<span class='warning'>You're too far away to read it!</span>"
-		return
-	if(user.can_read(src))
-		compile(user, user, scroll_text)
-		return
-	. += "<span class='warning'>You cannot read it!</span>"
 
 /obj/item/scroll/can_interact(mob/user)
 	if(in_contents_of(/obj/machinery/door/airlock))
