@@ -2,7 +2,7 @@
    
 */
 #define MAX_EXPRESSION_LENGTH 100 //Max symbols a spell can have, this includes both parts of a trick, $ & A. Generally to stop OP complex spells. 
-#define MAX_REACH 50 //Max distance a spell can reach, mainly stops people teleporting too far
+#define MAX_REACH 50 //Max distance a spell can reach, mainly stops people teleporting too far. NOT IMPLEMENTED CUZ KINDA GAY
 #define MAX_INTEGER 100 //Max number expression. As of writing, I don;t think big numbers can be exploited but, I'm not taking that risk.
 #define MAX_CALLBACK 9 //Stops loops from being infinite, pretty obvious why that's necesary.
 
