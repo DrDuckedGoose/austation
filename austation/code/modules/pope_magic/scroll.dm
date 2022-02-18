@@ -7,8 +7,8 @@
 #define MAX_CALLBACK 9 //Stops loops from being infinite, pretty obvious why that's necesary.
 
 
-/obj/item/casting_ring
-    name = "Enchanting casting_ring"
+/obj/item/scroll
+    name = "Enchanting Scroll"
     max_integrity = 100
     gender = NEUTER
     icon = 'icons/obj/bureaucracy.dmi'
@@ -24,16 +24,16 @@
     max_integrity = 150
     color = "white"
 
-    var/casting_ring_text = "" //what's written inside, the spell. Expressions & tricks
+    var/scroll_text = "" //what's written inside, the spell. Expressions & tricks
     var/atom/in_memory[2] //Which stack to save
     var/GREATER_SPELLS = FALSE //Grand virgin shit
 
-/obj/item/casting_ring/Initialize()
+/obj/item/scroll/Initialize()
     ..()
     pixel_y = rand(-8, 8)
     pixel_x = rand(-9, 9)
 
-/obj/item/casting_ring/proc/compile(mob/user, atom/target, var/casting_ring_text)
+/obj/item/scroll/proc/compile(mob/user, atom/target, var/scroll_text)
     //Variables set here are done so that they can be reset every call
 
     var/callback[MAX_CALLBACK] //Which loop/bracket is being discussed
@@ -49,7 +49,7 @@
     if(in_memory[2])stack[in_memory[1]] = in_memory[2] //Load memory into saved stack
 
     while(tongue||count < MAX_EXPRESSION_LENGTH)
-        tongue = casting_ring_text[count]
+        tongue = scroll_text[count]
 
         switch(tongue)
             //Regular expressions
@@ -75,7 +75,7 @@
                 else    
                     while(tongue != @"]")
                         count++
-                        tongue = casting_ring_text[count]
+                        tongue = scroll_text[count]
 
             if(@"]")//Jump BACK to next appropriate "[" if stack isn't null
                 if(stack[cursor])
@@ -103,7 +103,7 @@
 
             //Tricks, exciting!
             if(@"$")
-                tongue = casting_ring_text[count+1]
+                tongue = scroll_text[count+1]
                 count++
                 switch(tongue)
                     if("f")//Finish spell, use to save on cooldown
@@ -177,14 +177,14 @@
         count++
     return 1
 
-/obj/item/casting_ring/attack_self(mob/user)
-    compile(user, user, casting_ring_text)
+/obj/item/scroll/attack_self(mob/user)
+    compile(user, user, scroll_text)
 
-/obj/item/casting_ring/afterattack(atom/target, mob/user, proximity)
+/obj/item/scroll/afterattack(atom/target, mob/user, proximity)
     ..()
-    compile(user, target, casting_ring_text)
+    compile(user, target, scroll_text)
 
-/obj/item/casting_ring/can_interact(mob/user)
+/obj/item/scroll/can_interact(mob/user)
 	if(in_contents_of(/obj/machinery/door/airlock))
 		return TRUE
 	return ..()
