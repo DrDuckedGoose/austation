@@ -1,6 +1,5 @@
 /*
-    Copying some of obj/item/paper code
-
+   
 */
 #define MAX_EXPRESSION_LENGTH 100 //Max symbols a spell can have, this includes both parts of a trick, $ & A. Generally to stop OP complex spells. 
 #define MAX_REACH 50 //Max distance a spell can reach, mainly stops people teleporting too far
@@ -8,8 +7,8 @@
 #define MAX_CALLBACK 9 //Stops loops from being infinite, pretty obvious why that's necesary.
 
 
-/obj/item/scroll
-    name = "Enchanting Scroll"
+/obj/item/casting_ring
+    name = "Enchanting casting_ring"
     max_integrity = 100
     gender = NEUTER
     icon = 'icons/obj/bureaucracy.dmi'
@@ -25,16 +24,16 @@
     max_integrity = 150
     color = "white"
 
-    var/scroll_text = "" //what's written inside, the spell. Expressions & tricks
+    var/casting_ring_text = "" //what's written inside, the spell. Expressions & tricks
     var/atom/in_memory[2] //Which stack to save
     var/GREATER_SPELLS = FALSE //Grand virgin shit
 
-/obj/item/scroll/Initialize()
+/obj/item/casting_ring/Initialize()
     ..()
     pixel_y = rand(-8, 8)
     pixel_x = rand(-9, 9)
 
-/obj/item/scroll/proc/compile(mob/user, atom/target, var/scroll_text)
+/obj/item/casting_ring/proc/compile(mob/user, atom/target, var/casting_ring_text)
     //Variables set here are done so that they can be reset every call
 
     var/callback[MAX_CALLBACK] //Which loop/bracket is being discussed
@@ -47,12 +46,10 @@
     var/tongue = "" //What part of the spell is being read
     var/count = 1 //Essentially acts as a cursor
 
-    var/list_cursor = 1 //Cursor for navigating lists, rarely used
-
     if(in_memory[2])stack[in_memory[1]] = in_memory[2] //Load memory into saved stack
 
-    while(tongue||count < 100)
-        tongue = scroll_text[count]
+    while(tongue||count < MAX_EXPRESSION_LENGTH)
+        tongue = casting_ring_text[count]
 
         switch(tongue)
             //Regular expressions
@@ -63,10 +60,10 @@
                 if(cursor > 1)cursor--
 
             if(@"+")//Iterate stack foward
-                if(stack[cursor] < MAX_INTEGER)stack[cursor]++
+                if(stack[cursor] < MAX_INTEGER) stack[cursor]++
 
             if(@"-")//Iterate stack backwards
-                if(stack[cursor] > MAX_INTEGER*-1)stack[cursor]--
+                if(stack[cursor] > MAX_INTEGER*-1) stack[cursor]--
 
             if(@"[")//Jump to next apppropriate "]" if current stack is null
                 if(stack[cursor])
@@ -75,11 +72,10 @@
                     else if(count != callback[callback_cursor])   
                         callback_cursor++
                         callback[callback_cursor] = count
-
                 else    
                     while(tongue != @"]")
                         count++
-                        tongue = scroll_text[count]
+                        tongue = casting_ring_text[count]
 
             if(@"]")//Jump BACK to next appropriate "[" if stack isn't null
                 if(stack[cursor])
@@ -90,9 +86,10 @@
                         callback[callback_cursor] = null
                         callback_count[callback_cursor] = null
                         callback_cursor--
-
-                else
+                else 
                     callback[callback_cursor] = null
+                    callback_count[callback_cursor] = null
+                    callback_cursor--
 
             if(@"*")//Save current stack to memory
                 in_memory[1] = cursor
@@ -104,14 +101,9 @@
             if(@"=")//Load memory into current stack
                 stack[cursor] = in_memory[2]
 
-            if(@"^")//Changes where the list_cursor is looking
-                if(list_cursor < 3)
-                    list_cursor++
-                else list_cursor = 1
-
             //Tricks, exciting!
             if(@"$")
-                tongue = scroll_text[count+1]
+                tongue = casting_ring_text[count+1]
                 count++
                 switch(tongue)
                     if("f")//Finish spell, use to save on cooldown
@@ -148,45 +140,51 @@
                     if("l")//Set target to current stack, where, who or what you're clicking
                         stack[cursor] = target
 
-                    if("d")//Set next stack to the distance between the current and previous stack
+                    if("d")//Set previous stack to the distance between the current stack and the previous stack, sets the next current stack to null
                         var/loc1 = stack[cursor-1]
                         var/loc2 = stack[cursor]
 
-                        stack[cursor+1] = get_dist(loc1, loc2)
+                        stack[cursor-1] = get_dist(loc1, loc2)
+                        stack[cursor] = null
                     
                     if("t")//Teleport previous stack to current stack
                         var/atom/who = stack[cursor-1]
                         var/destination = stack[cursor]
-
                         var/atom/movable/AM = who
                         do_teleport(AM, destination)
 
-                    if("z")//Zap current stack
+                    if("h")//Zap current stack
                         var/mob/living/carbon/who = stack[cursor]
-                        who.electrocute_act(1, user, 1, 1)
+                        who.Paralyze(15)
 
                     if("i")//Interact with current stack
                         var/obj/what = stack[cursor]
                         what.attack_self_tk(user)
 
-                    if("b")//
+                    if("b")//Break the current stack down into an xyz at the current, next and next next stack, respectively. 
                         var/turf/where = get_turf(stack[cursor])
-                        var/loc_list = list(where.x, where.y, where.z)
-                        stack[cursor] = loc_list
+                        stack[cursor] = where.x
+                        stack[cursor+1] = where.y
+                        stack[cursor+2] = where.z
 
-                    //if("g")//Takes the current stack, x, and the next stack, y, and adds whatever it finds to the 
-                    
+                    if("c")//Collapse the current stack from an xyz(SEE "b")
+                        var/turf/where = locate(stack[cursor], stack[cursor+1], stack[cursor+2])
+                        stack[cursor] = where
+
+                        stack[cursor+1] = null
+                        stack[cursor+2] = null
+                        
         count++
     return 1
 
-/obj/item/scroll/attack_self(mob/user)
-    compile(user, user, scroll_text)
+/obj/item/casting_ring/attack_self(mob/user)
+    compile(user, user, casting_ring_text)
 
-/obj/item/scroll/afterattack(atom/target, mob/user, proximity)
+/obj/item/casting_ring/afterattack(atom/target, mob/user, proximity)
     ..()
-    compile(user, target, scroll_text)
+    compile(user, target, casting_ring_text)
 
-/obj/item/scroll/can_interact(mob/user)
+/obj/item/casting_ring/can_interact(mob/user)
 	if(in_contents_of(/obj/machinery/door/airlock))
 		return TRUE
 	return ..()

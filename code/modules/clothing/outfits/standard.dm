@@ -420,4 +420,9 @@
 	id = /obj/item/card/id/job/clown
 	ears = /obj/item/radio/headset/headset_srv
 
-
+/datum/outfit/enchanter
+	name = "Enchanter"
+	uniform = /obj/item/clothing/under/misc/patriotsuit
+	box = /obj/item/storage/box/debugtools
+	back = /obj/item/storage/backpack
+	r_hand = /obj/item/scroll
