@@ -101,7 +101,7 @@
             if(@"=")//Load memory into current stack
                 stack[cursor] = in_memory[2]
 
-            //Tricks. If making a new trick, be sure to define the symbol here.
+            //Tricks.
             if(@"$")
                 tongue = scroll_text[count+1]
                 count++
@@ -148,10 +148,13 @@
                         stack[cursor] = null
                     
                     if("t")//Teleport previous stack to current stack
-                        var/atom/who = stack[cursor-1]
+                        var/atom/movable/AM = stack[cursor-1]//TFW can't use funny name
                         var/destination = stack[cursor]
-                        var/atom/movable/AM = who
-                        do_teleport(AM, destination)
+
+                        if(istype(destination, /obj/structure/closet))
+                            var/obj/structure/closet/C = destination
+                            C.insert(AM)
+                        else do_teleport(AM, destination)
 
                     if("h")//Paralyze current target for a short period 
                         var/mob/living/carbon/who = stack[cursor]
@@ -168,6 +171,13 @@
                         stack[cursor+2] = where.z
 
                     if("c")//Collapse the current stack from an xyz(SEE "b")
+                        var/turf/where = locate(stack[cursor], stack[cursor+1], stack[cursor+2])
+                        stack[cursor] = where
+
+                        stack[cursor+1] = null
+                        stack[cursor+2] = null
+
+                    if("z")//Construct a damage type from the 
                         var/turf/where = locate(stack[cursor], stack[cursor+1], stack[cursor+2])
                         stack[cursor] = where
 
