@@ -101,7 +101,7 @@
             if(@"=")//Load memory into current stack
                 stack[cursor] = in_memory[2]
 
-            //Tricks, exciting!
+            //Tricks. If making a new trick, be sure to define the symbol here.
             if(@"$")
                 tongue = scroll_text[count+1]
                 count++
@@ -153,9 +153,9 @@
                         var/atom/movable/AM = who
                         do_teleport(AM, destination)
 
-                    if("h")//Zap current stack
+                    if("h")//Paralyze current target for a short period 
                         var/mob/living/carbon/who = stack[cursor]
-                        who.Paralyze(15)
+                        who.Paralyze(5)
 
                     if("i")//Interact with current stack
                         var/obj/what = stack[cursor]
