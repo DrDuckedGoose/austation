@@ -54,7 +54,7 @@
 	if(seed)
 		for(var/datum/plant_gene/trait/T in seed.genes)
 			T.on_throw_impact(src, M)
-	..()
+	. = ..()
 
 /obj/item/reagent_containers/food/snacks/grown/Destroy()//Carbon copy of ^
 	var/datum/plant_gene/trait/spines/S = seed.get_gene(/datum/plant_gene/trait/spines)
